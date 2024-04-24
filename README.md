@@ -1,5 +1,5 @@
 # Chains
-Chains is a backend web framework written Python. Chains follows the [WSGI](https://peps.python.org/pep-3333/) specification for web applications and the design of the framework is based on the [chain of responsibility](https://refactoring.guru/design-patterns/chain-of-responsibility) pattern.
+Chains is a backend web framework written in Python. Chains follows the [WSGI](https://peps.python.org/pep-3333/) specification for web applications and the design of the framework is based on the [chain of responsibility](https://refactoring.guru/design-patterns/chain-of-responsibility) pattern.
 Since Chains follows the WSGI spec, it can work with any WSGI based webserver (eg. [Gunicorn](https://gunicorn.org/), [uWSGI](https://uwsgi-docs.readthedocs.io), etc.)
 **NOTE: THIS IS A TOY PROJECT AND SHOULD NOT BE USED IN A PRODUCTION SETTING**
 
