@@ -22,7 +22,7 @@ class IBranch(ABC):
         pass
 
     @abstractmethod
-    def middleware(self, middleware_function: Callable[[IRequest, Callable[[IRequest], IResponse]], IResponse]) -> None:
+    def middleware(self, *args, **kwargs) -> Callable[[Callable], None]:
         pass
 
     @property
@@ -51,11 +51,14 @@ class BranchV1_1(IBranch):
         )
         return self
 
-    def middleware(self, middleware_function: Callable[[IRequest, Callable[[IRequest], IResponse]], IResponse]) -> None:
-        self.__branch_ingress_handler.add_middleware(
-            middleware_function=middleware_function
-        )
-        return None
+    def middleware(self, *args, **kwargs) -> Callable[[Callable], None]:
+        def decorator(middleware_function) -> None:
+            self._branch_ingress_handler.add_middleware(
+                middleware_function,
+                *args,
+                **kwargs
+            )
+        return decorator
 
     @property
     def _branch_ingress_handler(self) -> BranchIngressHandlerV1_1:
@@ -79,7 +82,7 @@ class AppV1_1(BranchV1_1, IApp):
         self.__root_ingress_handler: RootIngressHandlerV1_1 = RootIngressHandlerV1_1(
             primary_branch_ingress_handler=self._branch_ingress_handler
         )
-        self.__root_ingress_handler.add_middleware(
+        self.__root_ingress_handler.primary_branch_ingress_handler.add_middleware(
             middleware_function=root_error_handlerv1_1
         )
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, Any
 from typing_extensions import Self
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
@@ -35,10 +35,12 @@ class IMiddlewareHandler(IRequestHandler, ABC):
 
 class IIngressHandler(IRequestHandler, ABC):
 
-    def add_middleware(self, middleware_function: Callable[[IRequest, Callable[[IRequest], IResponse]], IResponse]) -> Self:
+    def add_middleware(self, middleware_function: Callable, *args, **kwargs) -> Self:
         middleware: MiddlewareHandlerV1_1 = MiddlewareHandlerV1_1(
             next=self._next,
-            middleware_function=middleware_function
+            middleware_function=middleware_function,
+            args=args,
+            kwargs=kwargs
         )
         self._next = middleware
         return self
@@ -144,9 +146,11 @@ class BranchIngressHandlerV1_1(IBranchIngressHandler):
 
 class MiddlewareHandlerV1_1(IMiddlewareHandler):
 
-    def __init__(self, next: IMiddlewareHandler|IBranchHandler|IBranchIngressHandler, middleware_function: Callable[[IRequest, Callable[[IRequest], IResponse]], IResponse]) -> None:
+    def __init__(self, next: IMiddlewareHandler|IBranchHandler|IBranchIngressHandler, middleware_function: Callable, args: tuple[Any, ...], kwargs: dict[str, Any]) -> None:
         self._next: IMiddlewareHandler|IBranchHandler|IBranchIngressHandler = next
         self._middleware_function: Callable[[IRequest, Callable[[IRequest], IResponse]], IResponse] = middleware_function
+        self._pos_dependencies: tuple[Any, ...] = args
+        self._kw_dependencies: dict[str, Any] = kwargs
 
         def wrapped_next(request: IRequest) -> IResponse:
             return self._next.handle(
@@ -172,7 +176,7 @@ class MiddlewareHandlerV1_1(IMiddlewareHandler):
         return self
 
     def handle(self, request: IRequest) -> IResponse:
-        return self._middleware_function(request, self._wrapped_next)
+        return self._middleware_function(request, self._wrapped_next, *self._pos_dependencies, **self._kw_dependencies)
 
 
 

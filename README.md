@@ -22,7 +22,8 @@ of Python
  
 ## In The Works
  
- - A dependency injection system for middleware and route functions
+ - ~~A dependency injection system for middleware~~
+ - A dependency injection system for routes
  - Wildcard branches
  - Functional (without using a decorator) APIs for adding middleware and route functions
  - Validation of parameters such as request method, request path, etc.
@@ -113,7 +114,9 @@ application.add_branch(path="/user", branch=user_branch)
 # make changes to it and return it once done.
 # middleware are run sequentially, with the first middleware added being
 # run last
-@application.middleware
+# the decorator must always end with '()' otherwise the middleware will
+# not be registered
+@application.middleware()
 def print_request_and_response_middleware(request: Request, next: RequestHandler) -> Response:
     # This is a simple middleware that intercepts every request, prints it
     # sends it downstream to get a response, prints it, and returns it
@@ -123,4 +126,24 @@ def print_request_and_response_middleware(request: Request, next: RequestHandler
     print(response)
     return response
 
+
+
+# middleware functions can also take custom arguments after the request
+# and the next handler, keep in mind that these arguments must be
+# passed to the decorator as well otherwise they will throw errors
+# during runtime when they are to be executed
+@application.middleware(req_per_sec: int = 10)
+def rate_limiter_middleware(request: Request, next: RequestHandler, req_per_sec: int) -> Response:
+    # checks if the request rate limit is exceeded and returns a 429 if so
+    if ...: # rate limit check would go here
+        response: Response = Response(
+            status_code=429,
+            status_text="TOO MANY REQUESTS"
+        )
+        response.headers.set_single_value_header(
+            name="Retry-After", value=...
+        )
+        return response
+    else:
+        return next(request)
 ```
