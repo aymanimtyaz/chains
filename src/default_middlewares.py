@@ -14,7 +14,7 @@ def root_error_handlerv1_1(request: IRequest, next: Callable[[IRequest], IRespon
             status_code=404,
             status_text="NOT FOUND"
         )
-        response.body = str(e)
+        response.body = str(e).encode()
         response.headers.set_single_value_header(
             name="Content-Type", value="text/plain"
         ).set_single_value_header(
@@ -25,7 +25,7 @@ def root_error_handlerv1_1(request: IRequest, next: Callable[[IRequest], IRespon
             status_code=405,
             status_text="METHOD NOT ALLOWED"
         )
-        response.body = str(e)
+        response.body = str(e).encode
         response.headers.set_single_value_header(
             name="Content-Type", value="text/plain"
         ).set_single_value_header(
@@ -38,7 +38,7 @@ def root_error_handlerv1_1(request: IRequest, next: Callable[[IRequest], IRespon
             status_code=500,
             status_text="INTERNAL SERVER ERROR"
         )
-        response.body = f"An unexpected error occurred: {str(e)}\nError Traceback: {format_exc()}\n"
+        response.body = f"An unexpected error occurred: {str(e)}\nError Traceback: {format_exc()}\n".encode()
         response.headers.set_single_value_header(
             name="Content-Type", value="text/plain"
         ).set_single_value_header(

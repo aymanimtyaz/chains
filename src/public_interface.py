@@ -131,7 +131,7 @@ class WSGIAppV1_1(AppV1_1, IWSGIApp):
             elif key == "wsgi.input":
                 body: bytes = value.read()
                 if len(body) > 0:
-                    request.body = body.decode()
+                    request.body = body
 
         response: Response = self.handle_request(
             request=request
@@ -143,7 +143,7 @@ class WSGIAppV1_1(AppV1_1, IWSGIApp):
             headers.append((key, str(value)))
 
         start_response(status, headers)
-        response_body: bytes = response.body.encode() if response.body is not None else b""
+        response_body: bytes = response.body if response.body is not None else b""
         return [response_body]
 
 
