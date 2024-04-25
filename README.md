@@ -54,7 +54,7 @@ def index(request: Request) -> Response:
     # The body and headers can be set on the response object using inbuilt
     # setters. Getters and deleters for different parts of the response
     # exist as well.
-    response.body = "Welcome to myApplication!!"
+    response.body = "Welcome to myApplication!!".encode()
     response.headers.set_single_value_header(name="Content-Type", value="text/plain").set_single_value_header(name="Content-Length", value=len(response.body))
     return response
 
@@ -70,15 +70,15 @@ user_branch: Branch = Branch()
 
 @user_branch.route("/", method="POST")
 def add_user(request: Request) -> Response:
-    request_body: str = request.body
+    request_body: str = request.body.decode()
     username, fullname = request_body.split(",")
     if username in users_dictionary:
         response: Response = Response(status_code=409, status_text="CONFLICT")
-        response.body = "A user with the same username already exists, please choose a different username"
+        response.body = "A user with the same username already exists, please choose a different username".encode()
     else:
         users_dictionary[username] = fullname
         response: Response = Response(status_code=201, status_text="CREATED")
-        response.body = "The user was created"
+        response.body = "The user was created".encode()
     response.headers.set_single_value_header(name="Content-Type", value="text/plain").set_single_value_header(name="Content-Length", value=len(response.body))
     return response
 
@@ -90,10 +90,10 @@ def get_user_by_username(request: Request) -> Response:
     username: str = request.path.split("/")[-1]
     if username not in users_dictionary:
         response: Response = Response(status_code=404, status_text="NOT FOUND")
-        response.body = "The specified user does not exist"
+        response.body = "The specified user does not exist".encode()
     else:
         response: Response = Response(status_code=200, status_text="OK")
-        response.body = f"User('{username}', '{users_dictionary[username]}')"
+        response.body = f"User('{username}', '{users_dictionary[username]}')".encode()
     response.headers.set_single_value_header(name="Content-Type", value="text/plain").set_single_value_header(name="Content-Length", value=len(response.body))
     return response
 
