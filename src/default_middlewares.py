@@ -45,3 +45,21 @@ def root_error_handlerv1_1(request: IRequest, next: Callable[[IRequest], IRespon
             name="Content-Length", value=len(response.body)
         )
     return response
+
+
+
+def catchall_error_handlerv1_1(request: IRequest, next: Callable[[IRequest], IResponse]) -> IResponse:
+    try:
+        response: IResponse = next(request)
+    except Exception as e:
+        response: ResponseV1_1 = ResponseV1_1(
+            status_code=500,
+            status_text="INTERNAL SERVER ERROR"
+        )
+        response.body = f"INTERNAL SERVER ERROR\n{str(e)}\nTraceback\n{format_exc()}".encode()
+        response.headers.set_single_value_header(
+            name="Content-Type", value="text/plain"
+        ).set_single_value_header(
+            name="Content-Length", value=len(response.body)
+        )
+    return response

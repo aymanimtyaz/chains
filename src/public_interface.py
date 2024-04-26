@@ -7,7 +7,7 @@ from typing_extensions import Self
 from chains.src.request import IRequest, RequestV1_1
 from chains.src.response import IResponse, ResponseV1_1
 from chains.src.handlers import IBranchIngressHandler, BranchIngressHandlerV1_1, RootIngressHandlerV1_1
-from chains.src.default_middlewares import root_error_handlerv1_1
+from chains.src.default_middlewares import root_error_handlerv1_1, catchall_error_handlerv1_1
 
 
 
@@ -84,6 +84,9 @@ class AppV1_1(BranchV1_1, IApp):
         )
         self.__root_ingress_handler.primary_branch_ingress_handler.add_middleware(
             middleware_function=root_error_handlerv1_1
+        )
+        self.__root_ingress_handler.add_middleware(
+            middleware_function=catchall_error_handlerv1_1
         )
 
     def handle_request(self, request: RequestV1_1) -> ResponseV1_1:
